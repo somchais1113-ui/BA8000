@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BA8000 Phase 1 — Data Driven Structure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#090a0d;
+  --surface:#11151d;
+  --surface2:#181d28;
+  --surface3:#212838;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(255,255,255,.16);
+  --text:#f2efe7;
+  --muted:#a8a298;
+  --faint:#706b62;
+  --purple:#988dff;
+  --teal:#44d5a6;
+  --coral:#ff865e;
+  --gold:#e0bd62;
+  --radius:22px;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  font-family:var(--sans);
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(152,141,255,.18),transparent 32rem),
+    radial-gradient(circle at 90% 12%,rgba(68,213,166,.12),transparent 34rem),
+    linear-gradient(180deg,#08090c,#0b0d12 45%,#090a0d);
+  font-size:15px;
+  line-height:1.7;
+}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+.container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+.app-shell{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;overflow:auto;
+  border-right:1px solid var(--line);
+  background:rgba(9,10,13,.78);
+  backdrop-filter:blur(18px);
+  padding:22px;
+}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand-mark{
+  width:40px;height:40px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(152,141,255,.2),rgba(68,213,166,.1));
+  border:1px solid rgba(152,141,255,.25);color:var(--purple);
+  font:700 13px/1 var(--mono);
+}
+.brand-title{font:700 13px/1.2 var(--mono);letter-spacing:.1em}
+.brand-sub{font-size:12px;color:var(--faint);margin-top:4px}
+.search{
+  width:100%;height:44px;border:1px solid var(--line);border-radius:15px;
+  background:rgba(255,255,255,.045);padding:0 14px;outline:none;margin-bottom:18px;
+}
+.search:focus{border-color:rgba(152,141,255,.45)}
+.nav-group{margin:18px 0}
+.nav-label{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--faint);text-transform:uppercase;margin-bottom:9px}
+.nav-btn{
+  position:relative;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 12px 11px 14px;border-radius:15px;color:var(--muted);text-align:left;overflow:hidden;
+  transition:background .2s,color .2s,transform .2s,box-shadow .2s;
+}
+.nav-btn::before{
+  content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:99px;background:transparent;
+  transition:background .2s,box-shadow .2s;
+}
+.nav-btn:hover{background:rgba(255,255,255,.055);color:var(--text);transform:translateX(2px)}
+.nav-btn.active{background:rgba(152,141,255,.13);color:var(--text);box-shadow:inset 0 0 0 1px rgba(152,141,255,.18)}
+.nav-btn.active::before{background:var(--purple);box-shadow:0 0 18px var(--purple)}
+.layer-filter[data-layer="understand-world"].active{background:rgba(152,141,255,.15);box-shadow:inset 0 0 0 1px rgba(152,141,255,.24)}
+.layer-filter[data-layer="formulate-strategy"].active{background:rgba(68,213,166,.13);box-shadow:inset 0 0 0 1px rgba(68,213,166,.22)}
+.layer-filter[data-layer="execute-communicate"].active{background:rgba(255,134,94,.14);box-shadow:inset 0 0 0 1px rgba(255,134,94,.24)}
+.layer-filter[data-layer="understand-world"].active::before{background:var(--purple);box-shadow:0 0 18px var(--purple)}
+.layer-filter[data-layer="formulate-strategy"].active::before{background:var(--teal);box-shadow:0 0 18px var(--teal)}
+.layer-filter[data-layer="execute-communicate"].active::before{background:var(--coral);box-shadow:0 0 18px var(--coral)}
+.count{font:600 10px/1 var(--mono);color:var(--faint)}
+.main{padding:34px 0 70px;min-width:0}
+.hero{
+  position:relative;isolation:isolate;overflow:hidden;border:1px solid var(--line);border-radius:30px;padding:36px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.026));
+  box-shadow:0 24px 80px rgba(0,0,0,.22);margin-bottom:28px;
+}
+.hero::before{
+  content:"";position:absolute;inset:-45%;z-index:-2;
+  background:radial-gradient(circle at 30% 30%,rgba(152,141,255,.26),transparent 22rem),radial-gradient(circle at 70% 40%,rgba(68,213,166,.16),transparent 24rem),radial-gradient(circle at 52% 78%,rgba(255,134,94,.13),transparent 20rem);
+  animation:orbitGlow 9s ease-in-out infinite;
+}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,10,13,.36),rgba(9,10,13,.70))}
+.kicker{font:700 11px/1 var(--mono);letter-spacing:.14em;color:var(--purple);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(34px,5vw,64px);font-weight:300;letter-spacing:-.055em;line-height:1.02;margin-bottom:14px}
+.hero p{max-width:820px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+.stat{position:relative;overflow:hidden;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.16);transition:transform .18s,border-color .18s}
+.stat::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.06),transparent);transform:translateX(-100%);transition:transform .6s}
+.stat:hover{transform:translateY(-3px);border-color:var(--line2)}
+.stat:hover::before{transform:translateX(100%)}
+.stat-num{font:700 24px/1 var(--mono);margin-bottom:7px}.stat-label{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 24px}
+.chip{
+  padding:9px 13px;border-radius:999px;border:1px solid var(--line);color:var(--muted);
+  background:rgba(255,255,255,.04);font:700 12px/1 var(--mono);
+  transition:transform .18s,background .18s,color .18s,border-color .18s;
+}
+.chip:hover{transform:translateY(-2px);color:var(--text);background:rgba(255,255,255,.06)}
+.chip.active{color:var(--text);border-color:rgba(152,141,255,.38);background:rgba(152,141,255,.14);box-shadow:0 0 24px rgba(152,141,255,.10)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes softPulse{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+@keyframes orbitGlow{0%{transform:translate3d(-8%,-8%,0) rotate(0deg)}50%{transform:translate3d(8%,6%,0) rotate(12deg)}100%{transform:translate3d(-8%,-8%,0) rotate(0deg)}}
+.hero,.card,.detail{animation:fadeSlideUp .42s cubic-bezier(.2,.8,.2,1) both}
+.grid .card:nth-child(1){animation-delay:.02s}.grid .card:nth-child(2){animation-delay:.06s}.grid .card:nth-child(3){animation-delay:.10s}.grid .card:nth-child(4){animation-delay:.14s}.grid .card:nth-child(5){animation-delay:.18s}.grid .card:nth-child(6){animation-delay:.22s}
+.card{
+  position:relative;isolation:isolate;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));
+  padding:19px;min-height:160px;box-shadow:0 18px 55px rgba(0,0,0,.18);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,background .22s,box-shadow .22s;
+}
+.card::before{content:"";position:absolute;inset:-1px;z-index:-2;background:linear-gradient(135deg,rgba(152,141,255,.22),rgba(68,213,166,.08),rgba(255,134,94,.10));opacity:0;transition:opacity .22s}
+.card::after{content:"";position:absolute;width:130px;height:130px;right:-54px;top:-54px;border-radius:50%;background:rgba(255,255,255,.05);transition:transform .28s,opacity .28s;opacity:.75;z-index:-1}
+.card:hover{transform:translateY(-5px);border-color:var(--line2);background:rgba(255,255,255,.075);box-shadow:0 26px 70px rgba(0,0,0,.28)}
+.card:hover::before{opacity:1}.card:hover::after{transform:scale(1.22);opacity:1}.card:active{transform:translateY(-1px) scale(.99)}
+.card[data-layer="understand-world"],.card.layer-understand-world{border-color:rgba(152,141,255,.34);background:linear-gradient(180deg,rgba(152,141,255,.13),rgba(255,255,255,.035))}
+.card[data-layer="formulate-strategy"],.card.layer-formulate-strategy{border-color:rgba(68,213,166,.34);background:linear-gradient(180deg,rgba(68,213,166,.12),rgba(255,255,255,.035))}
+.card[data-layer="execute-communicate"],.card.layer-execute-communicate{border-color:rgba(255,134,94,.36);background:linear-gradient(180deg,rgba(255,134,94,.13),rgba(255,255,255,.035))}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 10px;font:800 10px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;border:1px solid transparent}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 14px currentColor;animation:softPulse 2.2s ease-in-out infinite}
+.badge.layer-1{color:#b0a8ff;background:rgba(152,141,255,.16);border-color:rgba(152,141,255,.28)}
+.badge.layer-2{color:#61e6bb;background:rgba(68,213,166,.14);border-color:rgba(68,213,166,.26)}
+.badge.layer-3{color:#ff9a78;background:rgba(255,134,94,.16);border-color:rgba(255,134,94,.28)}
+.card-id{font:700 11px/1 var(--mono);color:var(--faint)}
+.card-title{font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.25;margin-bottom:5px}
+.card-sub{font-size:13px;color:var(--faint);margin-bottom:10px}.card-text{font-size:13px;color:var(--muted)}
+.meta-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.mini{font:600 10px/1 var(--mono);padding:5px 8px;border-radius:999px;color:var(--faint);background:rgba(255,255,255,.055)}
+.detail{position:relative;border:1px solid var(--line);border-radius:30px;background:rgba(255,255,255,.05);box-shadow:0 24px 80px rgba(0,0,0,.24);overflow:hidden}
+.detail::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 88% 8%,rgba(152,141,255,.16),transparent 18rem)}
+.detail-head{padding:28px 30px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.025)}
+.detail-title{font-size:clamp(30px,4vw,50px);font-weight:300;letter-spacing:-.05em;line-height:1.05;margin:10px 0}.detail-sub{color:var(--muted);max-width:780px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.tab{padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--muted);font:700 12px/1 var(--mono);transition:transform .18s,background .18s,color .18s}.tab:hover{transform:translateY(-2px);background:rgba(255,255,255,.07);color:var(--text)}.tab.active{background:rgba(152,141,255,.14);color:var(--text);border-color:rgba(152,141,255,.36);box-shadow:0 0 24px rgba(152,141,255,.10)}
+.detail-body{padding:28px 30px}.section-title{font:700 11px/1 var(--mono);letter-spacing:.14em;color:var(--faint);text-transform:uppercase;margin:26px 0 12px;display:flex;gap:12px;align-items:center}.section-title:first-child{margin-top:0}.section-title::after{content:"";height:1px;flex:1;background:var(--line)}
+.link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.link-card{position:relative;overflow:hidden;padding:14px;border:1px solid var(--line);border-radius:17px;background:rgba(0,0,0,.12);transition:transform .18s,border-color .18s,background .18s}.link-card::after{content:"→";position:absolute;right:14px;top:14px;color:var(--faint);transition:transform .18s,color .18s}.link-card:hover{transform:translateY(-2px);border-color:var(--line2);background:rgba(255,255,255,.055)}.link-card:hover::after{transform:translateX(3px);color:var(--text)}.link-name{font-weight:600;margin-bottom:4px}.link-desc{font-size:13px;color:var(--muted)}
+ul.clean{padding-left:18px;color:var(--muted)}.empty{padding:28px;border:1px solid var(--line);border-radius:22px;color:var(--muted);text-align:center;background:rgba(255,255,255,.035)}
+.test-panel{margin-top:26px;padding:14px;border:1px dashed rgba(255,255,255,.18);border-radius:18px;color:var(--faint);font:600 11px/1.5 var(--mono)}
+@media(max-width:1000px){.app-shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.grid{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.container{width:calc(100% - 26px)}.hero,.detail-head,.detail-body{padding:22px}.grid,.link-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">BA</div><div><div class="brand-title">BA8000</div><div class="brand-sub">Phase 1 · Data Driven</div></div></div>
+    <input id="global-search" class="search" type="search" placeholder="Search concepts, cases, lectures..." />
+    <div class="nav-group">
+      <div class="nav-label">Views</div>
+      <button class="nav-btn active" data-view="dashboard">Dashboard <span class="count">Home</span></button>
+      <button class="nav-btn" data-view="lectures">Lectures <span class="count" id="count-lectures"></span></button>
+      <button class="nav-btn" data-view="concepts">Concepts <span class="count" id="count-concepts"></span></button>
+      <button class="nav-btn" data-view="frameworks">Frameworks <span class="count" id="count-frameworks"></span></button>
+      <button class="nav-btn" data-view="cases">Cases <span class="count" id="count-cases"></span></button>
+      <button class="nav-btn" data-view="textbook">Textbook <span class="count" id="count-textbook"></span></button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Layer Filter</div>
+      <button class="nav-btn layer-filter active" data-layer="all">All Layers <span class="count">3</span></button>
+      <button class="nav-btn layer-filter" data-layer="understand-world">Layer 1 <span class="count">เข้าใจโลก</span></button>
+      <button class="nav-btn layer-filter" data-layer="formulate-strategy">Layer 2 <span class="count">กลยุทธ์</span></button>
+      <button class="nav-btn layer-filter" data-layer="execute-communicate">Layer 3 <span class="count">สื่อสาร</span></button>
+    </div>
+  </aside>
+  <main class="main"><div class="container" id="app"></div></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var db = {
+  course:{code:'BA8000',title:'Business Policy and Strategic Management',titleTh:'นโยบายธุรกิจและกลยุทธ์',instructor:'รศ.ดร.วิพุธ อ่องสกุล',year:'2026',textbook:'Crafting & Executing Strategy, 23rd Edition',grading:{participation:10,caseDiscussion:30,simulation:30,finalExam:30}},
+  layers:[
+    {id:'understand-world',label:'Layer 1',title:'เข้าใจโลก',color:'purple',description:'Change, environment, competition, industry average'},
+    {id:'formulate-strategy',label:'Layer 2',title:'กำหนดกลยุทธ์',color:'teal',description:'Competitive advantage, position, value proposition, trade-offs, fit, continuity'},
+    {id:'execute-communicate',label:'Layer 3',title:'สื่อสารและขับเคลื่อน',color:'coral',description:'Culture, core value, mission, vision, communication, execution'}
+  ],
+  textbookChapters:[
+    {id:'ch-01',no:1,title:'What Is Strategy and Why Is It Important?',keywords:['strategy','business model','competitive advantage','fit test','performance test']},
+    {id:'ch-02',no:2,title:'Charting a Company’s Direction',keywords:['vision','mission','values','objectives','corporate governance']},
+    {id:'ch-03',no:3,title:'External Environment and Industry Analysis',keywords:['five forces','strategic group','competitor analysis','value net']},
+    {id:'ch-04',no:4,title:'Resources, Capabilities, and Competitive Power',keywords:['VRIN','SWOT','value chain','benchmarking','dynamic capabilities']},
+    {id:'ch-05',no:5,title:'Five Generic Competitive Strategies',keywords:['low cost','differentiation','best cost','focused strategy','value price cost']},
+    {id:'ch-06',no:6,title:'Strengthening Competitive Position',keywords:['offensive','defensive','blue ocean','first mover','M&A','alliance']},
+    {id:'ch-07',no:7,title:'Competing in International Markets',keywords:['global strategy','multidomestic','transnational','Porter diamond']},
+    {id:'ch-08',no:8,title:'Corporate Strategy and Diversification',keywords:['diversification','related','unrelated','portfolio','resource fit']},
+    {id:'ch-09',no:9,title:'Ethics, CSR, Sustainability, and Strategy',keywords:['ethics','CSR','sustainability','values']},
+    {id:'ch-10',no:10,title:'Building an Organization Capable of Execution',keywords:['execution','capabilities','structure','people']},
+    {id:'ch-11',no:11,title:'Managing Internal Operations',keywords:['resources','policies','process','best practices','incentives']},
+    {id:'ch-12',no:12,title:'Corporate Culture and Leadership',keywords:['culture','leadership','values','change']}
+  ],
+  lectures:[
+    {id:'lec-01',no:1,layer:'understand-world',title:'Change and Strategy',titleTh:'การเปลี่ยนแปลงและกลยุทธ์',objective:'เข้าใจการเปลี่ยนแปลงและการกำหนดกลยุทธ์เพื่ออนาคต',bigIdea:'องค์กรต้องคิดไปข้างหน้า รับมือความไม่แน่นอน และกำหนดระดับความเสี่ยงที่พร้อมรับก่อนตัดสินใจเชิงกลยุทธ์',conceptIds:['linear-exponential','risk-appetite','dynamic-capabilities','future-oriented-mindset'],frameworkIds:['sense-seize-transform','risk-appetite-model'],caseIds:['meta-metaverse','scbx','reuters','kodak-fujifilm'],textbookChapterIds:['ch-01','ch-02','ch-04'],sourceRefs:{lectureNotePages:[6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],textbookPages:[]}},
+    {id:'lec-02',no:2,layer:'understand-world',title:'Strategic Approach',titleTh:'ลีลากลยุทธ์',objective:'เลือกแนวทางกลยุทธ์ให้เหมาะกับความผันผวนและความสามารถในการกำหนดเกมของธุรกิจ',bigIdea:'ไม่มี strategic approach แบบเดียวที่ใช้ได้ทุกสถานการณ์ ต้องเลือก palette ให้เหมาะกับสภาพแวดล้อม',conceptIds:['vuca-bani','strategic-palette','three-horizons'],frameworkIds:['strategic-palette-framework','three-horizons-framework','zone-to-win'],caseIds:['zara','airbnb-grab','pg-lafley'],textbookChapterIds:['ch-06','ch-08'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-03',no:3,layer:'understand-world',title:'Competition and Competitive Dimension',titleTh:'การแข่งขันและมิติการแข่งขัน',objective:'เข้าใจธรรมชาติของการแข่งขันและเลือกมิติที่จะแข่งให้ถูก',bigIdea:'กลยุทธ์ที่ดีไม่ใช่แข่งให้ดีที่สุดในมิติเดียวกับคู่แข่ง แต่ต้องเลือกมิติที่ทำให้เรา unique',conceptIds:['value-create-capture','competitive-convergence','compete-to-be-unique','blue-ocean'],frameworkIds:['five-forces','value-price-cost'],caseIds:['cirque-du-soleil','price-war'],textbookChapterIds:['ch-03','ch-05','ch-06'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-04',no:4,layer:'understand-world',title:'Industry Structure: Average',titleTh:'โครงสร้างอุตสาหกรรมและค่าเฉลี่ย',objective:'วิเคราะห์อุตสาหกรรมเพื่อรู้ industry average, weak signal และ strategic response',bigIdea:'ต้องรู้ baseline ของอุตสาหกรรมก่อน จึงจะรู้ว่ากลยุทธ์ของเราควรเหนือกว่าค่าเฉลี่ยตรงไหน',conceptIds:['industry-average','weak-signal','pestel'],frameworkIds:['four-c-framework','five-forces'],caseIds:['geopolitics-trade-war'],textbookChapterIds:['ch-03'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-05',no:5,layer:'formulate-strategy',title:'Competitive Advantage',titleTh:'ความได้เปรียบในการแข่งขัน',objective:'เข้าใจแหล่งที่มาของ competitive advantage และการวิเคราะห์จากทรัพยากร/กิจกรรม',bigIdea:'ความได้เปรียบต้องมาจากสิ่งที่สร้างคุณค่าและคู่แข่งเลียนแบบยาก',conceptIds:['competitive-advantage','vrin','value-chain','benchmarking'],frameworkIds:['vrin-framework','value-chain-framework','swot'],caseIds:['apple','toyota-production-system'],textbookChapterIds:['ch-04'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-06',no:6,layer:'formulate-strategy',title:'Competitive Position',titleTh:'ตำแหน่งการแข่งขัน',objective:'กำหนดตำแหน่งในอุตสาหกรรมเทียบกับ industry average และ strategic groups',bigIdea:'position คือจุดยืนที่เลือกอย่างมีเหตุผล ไม่ใช่แค่ภาพลักษณ์ทางการตลาด',conceptIds:['competitive-position','strategic-group','mobility-barrier'],frameworkIds:['strategic-group-map'],caseIds:['ikea','ryanair'],textbookChapterIds:['ch-03','ch-05'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-07',no:7,layer:'formulate-strategy',title:'Creating Unique Value',titleTh:'การสร้างคุณค่าที่โดดเด่น',objective:'ออกแบบ unique value proposition และ tailored value chain',bigIdea:'กลยุทธ์เริ่มจากการตอบให้ได้ว่า ลูกค้าคือใคร ต้องการอะไร และยอมจ่ายราคาแบบไหน',conceptIds:['unique-value-proposition','tailored-value-chain','customer-types'],frameworkIds:['value-proposition-framework','value-chain-framework'],caseIds:['walmart','southwest','enterprise'],textbookChapterIds:['ch-04','ch-05'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-08',no:8,layer:'formulate-strategy',title:'Trade-offs',titleTh:'การเลือกและการไม่เลือก',objective:'เข้าใจ trade-offs ในฐานะหัวใจของ strategy',bigIdea:'ถ้าทำทุกอย่างเพื่อทุกคน จะไม่มีกลยุทธ์ที่ชัดเจน',conceptIds:['trade-offs','choosing-what-not-to-do','five-c-tradeoff'],frameworkIds:['tradeoff-test','five-c-tradeoff-framework'],caseIds:['mcdonalds','ikea','southwest'],textbookChapterIds:['ch-05'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-09',no:9,layer:'formulate-strategy',title:'Fit',titleTh:'ความสอดคล้องของกิจกรรม',objective:'เข้าใจ activity fit และเหตุผลที่ทำให้กลยุทธ์เลียนแบบยาก',bigIdea:'ความสำเร็จไม่ได้อยู่ที่กิจกรรมเดี่ยว แต่อยู่ที่ระบบกิจกรรมที่เสริมแรงกัน',conceptIds:['fit','activity-system','reinforcing-activities'],frameworkIds:['activity-system-map','three-types-of-fit'],caseIds:['southwest','ikea'],textbookChapterIds:['ch-04','ch-05'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-10',no:10,layer:'formulate-strategy',title:'Continuity',titleTh:'ความต่อเนื่อง',objective:'เข้าใจว่ากลยุทธ์ต้องการเวลา แต่ยังต้องปรับตัวอย่างมีวินัย',bigIdea:'กลยุทธ์เหมือนการตุ๋น ไม่ใช่การผัด ต้องให้เวลา fit, culture และ customer perception ก่อตัว',conceptIds:['continuity','experiment-vs-exploratory','strategy-change'],frameworkIds:['experiment-exploratory-framework'],caseIds:['mandarin-oriental','airasia','starbucks'],textbookChapterIds:['ch-10','ch-11','ch-12'],sourceRefs:{lectureNotePages:[],textbookPages:[]}},
+    {id:'lec-11',no:11,layer:'execute-communicate',title:'Communicate Your Strategy',titleTh:'การสื่อสารกลยุทธ์',objective:'สื่อสารกลยุทธ์ให้พนักงาน คู่ค้า ลูกค้า และคู่แข่งเข้าใจ',bigIdea:'กลยุทธ์ต้องถูกสื่อสาร เพราะคนที่ execute ต้องเข้าใจ why, how และ what',conceptIds:['core-value','culture-eats-strategy','start-with-why','mission-vision'],frameworkIds:['golden-circle','culture-strategy-alignment'],caseIds:['apple','hp-carly-fiorina','thai-regulators'],textbookChapterIds:['ch-02','ch-12'],sourceRefs:{lectureNotePages:[],textbookPages:[]}}
+  ],
+  concepts:[
+    {id:'linear-exponential',name:'Linear vs Exponential Change',th:'การเปลี่ยนแปลงแบบเส้นตรง vs ทวีคูณ',summary:'องค์กรจำนวนมากคิดแบบ linear แต่สภาพแวดล้อมธุรกิจจำนวนมากเปลี่ยนแบบ exponential จนเกิด disruption',lectureIds:['lec-01'],caseIds:['kodak-fujifilm'],textbookChapterIds:['ch-01']},
+    {id:'risk-appetite',name:'Risk Appetite',th:'ระดับความเสี่ยงที่ยอมรับได้',summary:'ระดับความเสี่ยงที่องค์กรยินดีรับเพื่อไปสู่อนาคต ใช้คู่กับ risk tolerance และ risk intolerance',lectureIds:['lec-01'],caseIds:['meta-metaverse','scbx'],textbookChapterIds:['ch-01','ch-02']},
+    {id:'dynamic-capabilities',name:'Dynamic Capabilities',th:'ความสามารถในการปรับตัวเชิงพลวัต',summary:'ความสามารถในการ sense, seize และ transform เพื่อตอบสนองต่อการเปลี่ยนแปลง',lectureIds:['lec-01'],caseIds:['kodak-fujifilm','scbx'],textbookChapterIds:['ch-04']},
+    {id:'future-oriented-mindset',name:'Future-Oriented Mindset',th:'วิธีคิดมุ่งอนาคต',summary:'มองอนาคต สร้างมูลค่าเพิ่ม และไม่ยึดติด core เดิมมากเกินไป',lectureIds:['lec-01'],caseIds:['scbx','meta-metaverse'],textbookChapterIds:['ch-01']},
+    {id:'vuca-bani',name:'VUCA / BANI',th:'โลกผันผวนและเปราะบาง',summary:'กรอบคิดเรื่องสภาพแวดล้อมที่ผันผวน ไม่แน่นอน ซับซ้อน คลุมเครือ และเปราะบาง',lectureIds:['lec-02'],caseIds:[],textbookChapterIds:['ch-03']},
+    {id:'strategic-palette',name:'Strategic Palette',th:'ลีลากลยุทธ์',summary:'เลือกแนวทางกลยุทธ์ตามระดับความผันผวนและความสามารถในการกำหนดอุตสาหกรรม',lectureIds:['lec-02'],caseIds:['zara','airbnb-grab'],textbookChapterIds:['ch-06']},
+    {id:'three-horizons',name:'McKinsey Three Horizons',th:'สามขอบฟ้าการเติบโต',summary:'แบ่งการลงทุนเป็น H1 ธุรกิจปัจจุบัน, H2 ธุรกิจใหม่ที่เริ่มโต, H3 อนาคตระยะไกล',lectureIds:['lec-02'],caseIds:[],textbookChapterIds:['ch-08']},
+    {id:'value-create-capture',name:'Value Creation vs Value Capture',th:'การสร้างคุณค่า vs การเก็บเกี่ยวคุณค่า',summary:'ธุรกิจต้องสร้างคุณค่าและ capture คุณค่านั้นกลับมาเป็นผลตอบแทน',lectureIds:['lec-03'],caseIds:[],textbookChapterIds:['ch-01','ch-05']},
+    {id:'competitive-convergence',name:'Competitive Convergence',th:'การแข่งขันจนเหมือนกัน',summary:'เมื่อทุกคนแข่งในมิติเดียวกัน ข้อเสนอเหมือนกันและมักนำไปสู่สงครามราคา',lectureIds:['lec-03'],caseIds:['price-war'],textbookChapterIds:['ch-05']},
+    {id:'compete-to-be-unique',name:'Compete to Be Unique',th:'แข่งขันด้วยความแตกต่างที่เลือกเอง',summary:'กลยุทธ์ที่ดีคือเลือกตำแหน่งที่แตกต่าง ไม่ใช่พยายามเป็นที่สุดในมิติเดียวกัน',lectureIds:['lec-03'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-05']},
+    {id:'blue-ocean',name:'Blue Ocean Strategy',th:'กลยุทธ์น่านน้ำสีคราม',summary:'สร้างพื้นที่การแข่งขันใหม่ ลดการปะทะตรงกับคู่แข่งในตลาดเดิม',lectureIds:['lec-03'],caseIds:['cirque-du-soleil'],textbookChapterIds:['ch-06']},
+    {id:'industry-average',name:'Industry Average',th:'ค่าเฉลี่ยอุตสาหกรรม',summary:'baseline ของอุตสาหกรรมที่ใช้เทียบว่าบริษัทอยู่เหนือหรือต่ำกว่าค่าเฉลี่ยในมิติใด',lectureIds:['lec-04','lec-06'],caseIds:[],textbookChapterIds:['ch-03']},
+    {id:'weak-signal',name:'Weak Signal',th:'สัญญาณอ่อน',summary:'สัญญาณเริ่มต้นของการเปลี่ยนแปลงที่อาจกลายเป็น threat หรือ opportunity สำคัญ',lectureIds:['lec-04'],caseIds:['geopolitics-trade-war'],textbookChapterIds:['ch-03']},
+    {id:'pestel',name:'PESTEL',th:'วิเคราะห์ปัจจัยมหภาค',summary:'Political, Economic, Sociocultural, Technological, Environmental, Legal',lectureIds:['lec-04'],caseIds:['geopolitics-trade-war'],textbookChapterIds:['ch-03']},
+    {id:'competitive-advantage',name:'Competitive Advantage',th:'ความได้เปรียบในการแข่งขัน',summary:'ความสามารถในการสร้างคุณค่าได้เหนือคู่แข่งหรือมีต้นทุนต่ำกว่าอย่างยั่งยืน',lectureIds:['lec-05'],caseIds:['apple','toyota-production-system'],textbookChapterIds:['ch-04','ch-05']},
+    {id:'vrin',name:'VRIN',th:'Valuable Rare Inimitable Non-substitutable',summary:'เกณฑ์ประเมินว่าทรัพยากรหรือ capability สามารถสร้าง sustainable advantage ได้หรือไม่',lectureIds:['lec-05'],caseIds:['apple','toyota-production-system'],textbookChapterIds:['ch-04']},
+    {id:'value-chain',name:'Value Chain',th:'ห่วงโซ่คุณค่า',summary:'วิเคราะห์กิจกรรมหลักและกิจกรรมสนับสนุนเพื่อดูว่ากิจกรรมใดสร้างหรือทำลายคุณค่า',lectureIds:['lec-05','lec-07'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-04']},
+    {id:'benchmarking',name:'Benchmarking',th:'การเทียบเคียง',summary:'เปรียบเทียบ performance หรือกิจกรรมกับคู่แข่งและ best-in-class',lectureIds:['lec-05'],caseIds:[],textbookChapterIds:['ch-04']},
+    {id:'competitive-position',name:'Competitive Position',th:'ตำแหน่งการแข่งขัน',summary:'จุดยืนที่บริษัทเลือกในมิติการแข่งขันและคุณค่าที่เสนอให้ลูกค้า',lectureIds:['lec-06'],caseIds:['ikea','ryanair'],textbookChapterIds:['ch-03','ch-05']},
+    {id:'strategic-group',name:'Strategic Group',th:'กลุ่มกลยุทธ์',summary:'กลุ่มบริษัทในอุตสาหกรรมที่ใช้กลยุทธ์หรือมีมิติการแข่งขันคล้ายกัน',lectureIds:['lec-06'],caseIds:['ryanair'],textbookChapterIds:['ch-03']},
+    {id:'mobility-barrier',name:'Mobility Barrier',th:'อุปสรรคการย้ายกลุ่ม',summary:'สิ่งที่ทำให้บริษัทขยับจาก strategic group หนึ่งไปอีกกลุ่มได้ยาก',lectureIds:['lec-06'],caseIds:[],textbookChapterIds:['ch-03']},
+    {id:'unique-value-proposition',name:'Unique Value Proposition',th:'ข้อเสนอคุณค่าที่โดดเด่น',summary:'ตอบว่าใครคือลูกค้า ต้องการอะไร และยอมจ่ายราคาแบบไหน',lectureIds:['lec-07'],caseIds:['walmart','southwest','enterprise'],textbookChapterIds:['ch-05']},
+    {id:'tailored-value-chain',name:'Tailored Value Chain',th:'ห่วงโซ่คุณค่าที่ออกแบบเฉพาะ',summary:'ชุดกิจกรรมที่ถูกออกแบบให้รองรับ value proposition ที่เลือก',lectureIds:['lec-07'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-04','ch-05']},
+    {id:'customer-types',name:'Customer Types',th:'ประเภทลูกค้า',summary:'Ignored, under-served, over-served, served ใช้หาโอกาสในการสร้าง value proposition ใหม่',lectureIds:['lec-07'],caseIds:['walmart','enterprise'],textbookChapterIds:['ch-05']},
+    {id:'trade-offs',name:'Trade-offs',th:'การเลือกและการไม่เลือก',summary:'หัวใจของกลยุทธ์คือการเลือกว่าจะทำอะไรและจะไม่ทำอะไร',lectureIds:['lec-08'],caseIds:['mcdonalds','ikea','southwest'],textbookChapterIds:['ch-05']},
+    {id:'choosing-what-not-to-do',name:'Choosing What Not to Do',th:'เลือกสิ่งที่จะไม่ทำ',summary:'ถ้ากลยุทธ์ไม่มีการปฏิเสธ ก็อาจเป็นเพียง operational improvement',lectureIds:['lec-08'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-05']},
+    {id:'five-c-tradeoff',name:'5C Sources of Trade-off',th:'แหล่งที่มาของ trade-off',summary:'Conflict, Congestion, Compromise, Confusion, Contradiction',lectureIds:['lec-08'],caseIds:[],textbookChapterIds:['ch-05']},
+    {id:'fit',name:'Fit',th:'ความสอดคล้อง',summary:'กิจกรรมหลายตัวเสริมแรงกัน ลดต้นทุนรวม หรือเพิ่มคุณค่าให้เด่นชัดขึ้น',lectureIds:['lec-09'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-04','ch-05']},
+    {id:'activity-system',name:'Activity System',th:'ระบบกิจกรรม',summary:'แผนที่ความเชื่อมโยงของกิจกรรมที่ทำให้กลยุทธ์เลียนแบบยาก',lectureIds:['lec-09'],caseIds:['ikea','southwest'],textbookChapterIds:['ch-04']},
+    {id:'reinforcing-activities',name:'Reinforcing Activities',th:'กิจกรรมที่เสริมแรงกัน',summary:'กิจกรรมที่ทำให้ผลรวมทั้งระบบดีกว่าผลบวกของกิจกรรมเดี่ยว',lectureIds:['lec-09'],caseIds:['southwest'],textbookChapterIds:['ch-04']},
+    {id:'continuity',name:'Continuity',th:'ความต่อเนื่อง',summary:'กลยุทธ์ต้องใช้เวลาเพื่อให้ลูกค้า พนักงาน และคู่ค้าเข้าใจและจดจำ position',lectureIds:['lec-10'],caseIds:['mandarin-oriental','starbucks'],textbookChapterIds:['ch-10','ch-12']},
+    {id:'experiment-vs-exploratory',name:'Experiment vs Exploratory',th:'ทดลองในกลยุทธ์เดิม vs ค้นหากลยุทธ์ใหม่',summary:'Experiment คือปรับวิธีทำในทิศทางเดิม ส่วน exploratory คือค้นหาทิศทางใหม่',lectureIds:['lec-10'],caseIds:['airasia'],textbookChapterIds:['ch-10']},
+    {id:'strategy-change',name:'Change of Strategy',th:'การเปลี่ยนกลยุทธ์',summary:'เปลี่ยนได้เมื่อ industry เปลี่ยน, value proposition obsolete หรือ fit เดิมใช้ไม่ได้',lectureIds:['lec-10'],caseIds:[],textbookChapterIds:['ch-10','ch-12']},
+    {id:'core-value',name:'Core Value',th:'ค่านิยมหลัก',summary:'หลักคิดและพฤติกรรมร่วมที่ต้องสนับสนุนกลยุทธ์',lectureIds:['lec-11'],caseIds:['thai-regulators'],textbookChapterIds:['ch-02','ch-12']},
+    {id:'culture-eats-strategy',name:'Culture Eats Strategy',th:'วัฒนธรรมกินกลยุทธ์เป็นอาหารเช้า',summary:'กลยุทธ์ที่ขัดกับวัฒนธรรมองค์กรจะ execute ได้ยาก',lectureIds:['lec-11'],caseIds:['hp-carly-fiorina'],textbookChapterIds:['ch-12']},
+    {id:'start-with-why',name:'Start With Why',th:'เริ่มจากทำไม',summary:'สื่อสาร purpose ก่อนวิธีทำและสิ่งที่ทำ เพื่อสร้าง belief',lectureIds:['lec-11'],caseIds:['apple'],textbookChapterIds:['ch-02']},
+    {id:'mission-vision',name:'Mission / Vision',th:'พันธกิจและวิสัยทัศน์',summary:'เครื่องมือสื่อสารทิศทางและเหตุผลขององค์กร',lectureIds:['lec-11'],caseIds:['thai-regulators'],textbookChapterIds:['ch-02']}
+  ],
+  frameworks:[
+    {id:'sense-seize-transform',name:'Sense / Seize / Transform',summary:'ตรวจจับอนาคต → คว้าโอกาส → ปรับโครงสร้าง',conceptIds:['dynamic-capabilities'],lectureIds:['lec-01']},
+    {id:'risk-appetite-model',name:'Risk Appetite Model',summary:'Risk appetite, risk tolerance และ risk intolerance เพื่อกำหนดกรอบความเสี่ยง',conceptIds:['risk-appetite'],lectureIds:['lec-01']},
+    {id:'strategic-palette-framework',name:'Strategic Palette',summary:'Classical, Adaptive, Shaping, Visionary ตามความผันผวนและความสามารถในการกำหนดเกม',conceptIds:['strategic-palette'],lectureIds:['lec-02']},
+    {id:'three-horizons-framework',name:'Three Horizons',summary:'H1 ปัจจุบัน, H2 ธุรกิจใหม่, H3 อนาคตไกล',conceptIds:['three-horizons'],lectureIds:['lec-02']},
+    {id:'zone-to-win',name:'Zone to Win',summary:'จัดพื้นที่การลงทุนและ execution สำหรับธุรกิจหลัก/ธุรกิจใหม่',conceptIds:['three-horizons'],lectureIds:['lec-02']},
+    {id:'five-forces',name:'Porter Five Forces',summary:'วิเคราะห์แรงกดดันการแข่งขันในอุตสาหกรรม',conceptIds:['industry-average'],lectureIds:['lec-03','lec-04']},
+    {id:'value-price-cost',name:'Value-Price-Cost',summary:'อธิบายการสร้างมูลค่าทางเศรษฐกิจและ competitive advantage',conceptIds:['value-create-capture'],lectureIds:['lec-03']},
+    {id:'four-c-framework',name:'4C Framework',summary:'Company, Customers & Stakeholders, Competitive Environment, Compliance',conceptIds:['industry-average','weak-signal'],lectureIds:['lec-04']},
+    {id:'vrin-framework',name:'VRIN Framework',summary:'Valuable, Rare, Inimitable, Non-substitutable',conceptIds:['vrin'],lectureIds:['lec-05']},
+    {id:'value-chain-framework',name:'Value Chain Analysis',summary:'Primary activities + support activities เพื่อวิเคราะห์ value/cost',conceptIds:['value-chain','tailored-value-chain'],lectureIds:['lec-05','lec-07']},
+    {id:'swot',name:'SWOT',summary:'Strengths, Weaknesses, Opportunities, Threats',conceptIds:['competitive-advantage'],lectureIds:['lec-05']},
+    {id:'strategic-group-map',name:'Strategic Group Map',summary:'วางคู่แข่งบนแกน 2 มิติเพื่อเห็น cluster และช่องว่าง',conceptIds:['strategic-group'],lectureIds:['lec-06']},
+    {id:'value-proposition-framework',name:'Value Proposition Framework',summary:'Who, What, Price',conceptIds:['unique-value-proposition'],lectureIds:['lec-07']},
+    {id:'tradeoff-test',name:'Trade-off Test',summary:'ถ้าทำ A แล้วทำ B ไม่ได้หรือทำได้แย่ลง นั่นคือ trade-off จริง',conceptIds:['trade-offs'],lectureIds:['lec-08']},
+    {id:'five-c-tradeoff-framework',name:'5C Trade-off Sources',summary:'Conflict, Congestion, Compromise, Confusion, Contradiction',conceptIds:['five-c-tradeoff'],lectureIds:['lec-08']},
+    {id:'activity-system-map',name:'Activity System Map',summary:'แผนที่กิจกรรมและความเชื่อมโยงที่ทำให้กลยุทธ์แข็งแรง',conceptIds:['activity-system','fit'],lectureIds:['lec-09']},
+    {id:'three-types-of-fit',name:'Three Types of Fit',summary:'Simple consistency, reinforcement, optimization',conceptIds:['fit'],lectureIds:['lec-09']},
+    {id:'experiment-exploratory-framework',name:'Experiment vs Exploratory',summary:'แยกการทดลองในกลยุทธ์เดิมออกจากการค้นหากลยุทธ์ใหม่',conceptIds:['experiment-vs-exploratory'],lectureIds:['lec-10']},
+    {id:'golden-circle',name:'Golden Circle',summary:'Why → How → What',conceptIds:['start-with-why'],lectureIds:['lec-11']},
+    {id:'culture-strategy-alignment',name:'Culture / Strategy Alignment',summary:'ตรวจว่า core value และ culture สนับสนุน strategy หรือขัดกัน',conceptIds:['culture-eats-strategy','core-value'],lectureIds:['lec-11']}
+  ],
+  cases:[
+    {id:'meta-metaverse',company:'Meta / Metaverse',issue:'Strategic bet และ risk appetite ระยะยาว',conceptIds:['risk-appetite','future-oriented-mindset'],lectureIds:['lec-01']},
+    {id:'scbx',company:'SCBX',issue:'Transformation และการไม่ยึดติดธุรกิจธนาคารเดิม',conceptIds:['risk-appetite','dynamic-capabilities','future-oriented-mindset'],lectureIds:['lec-01']},
+    {id:'reuters',company:'Reuters',issue:'เปลี่ยน technology แต่รักษา value proposition เรื่อง fast information',conceptIds:['future-oriented-mindset'],lectureIds:['lec-01']},
+    {id:'kodak-fujifilm',company:'Kodak vs Fujifilm',issue:'Disruption และความสามารถในการ transform',conceptIds:['linear-exponential','dynamic-capabilities'],lectureIds:['lec-01']},
+    {id:'zara',company:'Zara',issue:'Adaptive strategy และ fast fashion',conceptIds:['strategic-palette'],lectureIds:['lec-02']},
+    {id:'airbnb-grab',company:'Airbnb / Grab',issue:'Shaping strategy และ platform ecosystem',conceptIds:['strategic-palette'],lectureIds:['lec-02']},
+    {id:'pg-lafley',company:'P&G / Lafley',issue:'Classical strategy และ focus',conceptIds:['strategic-palette'],lectureIds:['lec-02']},
+    {id:'cirque-du-soleil',company:'Cirque du Soleil',issue:'Blue Ocean ผ่านการผสม circus + theater',conceptIds:['blue-ocean'],lectureIds:['lec-03']},
+    {id:'price-war',company:'Price War',issue:'แข่งขันในมิติเดียวกันจนกำไรหาย',conceptIds:['competitive-convergence'],lectureIds:['lec-03']},
+    {id:'geopolitics-trade-war',company:'US-China Trade War',issue:'Weak signal และ supply chain impact',conceptIds:['weak-signal','pestel'],lectureIds:['lec-04']},
+    {id:'apple',company:'Apple',issue:'Brand, ecosystem, design และการสื่อสาร why',conceptIds:['competitive-advantage','vrin','start-with-why'],lectureIds:['lec-05','lec-11']},
+    {id:'toyota-production-system',company:'Toyota Production System',issue:'Lean capability ที่เลียนแบบยาก',conceptIds:['competitive-advantage','vrin'],lectureIds:['lec-05']},
+    {id:'ikea',company:'IKEA',issue:'Position, trade-offs และ activity fit',conceptIds:['compete-to-be-unique','competitive-position','tailored-value-chain','trade-offs','fit','activity-system'],lectureIds:['lec-06','lec-08','lec-09']},
+    {id:'ryanair',company:'Ryanair',issue:'Ultra low-cost position',conceptIds:['competitive-position','strategic-group'],lectureIds:['lec-06']},
+    {id:'walmart',company:'Walmart',issue:'Everyday Low Price สำหรับตลาด ignored/underserved',conceptIds:['unique-value-proposition','customer-types'],lectureIds:['lec-07']},
+    {id:'southwest',company:'Southwest Airlines',issue:'Low-cost position, trade-offs และ fit',conceptIds:['unique-value-proposition','trade-offs','fit','activity-system'],lectureIds:['lec-07','lec-08','lec-09']},
+    {id:'enterprise',company:'Enterprise Rent-A-Car',issue:'Value proposition สำหรับลูกค้า ignored',conceptIds:['unique-value-proposition','customer-types'],lectureIds:['lec-07']},
+    {id:'mcdonalds',company:'McDonald’s',issue:'Speed/consistency trade-off กับ customization',conceptIds:['trade-offs'],lectureIds:['lec-08']},
+    {id:'mandarin-oriental',company:'Mandarin Oriental Bangkok',issue:'Continuity และ service reputation',conceptIds:['continuity'],lectureIds:['lec-10']},
+    {id:'airasia',company:'AirAsia',issue:'Experiment ภายใน low-cost strategy',conceptIds:['experiment-vs-exploratory'],lectureIds:['lec-10']},
+    {id:'starbucks',company:'Starbucks',issue:'Partner culture และ continuity',conceptIds:['continuity'],lectureIds:['lec-10']},
+    {id:'hp-carly-fiorina',company:'HP / Carly Fiorina',issue:'Strategy ใหม่ขัดกับ culture เดิม',conceptIds:['culture-eats-strategy'],lectureIds:['lec-11']},
+    {id:'thai-regulators',company:'ก.ล.ต. / ธปท.',issue:'Core value, mission และ public sector strategy communication',conceptIds:['core-value','mission-vision'],lectureIds:['lec-11']}
+  ],
+  examQuestions:[
+    {id:'q-risk-appetite-01',type:'essay',prompt:'อธิบาย Risk Appetite และยกตัวอย่างการใช้ในเชิงกลยุทธ์',conceptIds:['risk-appetite'],lectureIds:['lec-01'],caseIds:['meta-metaverse','scbx']},
+    {id:'q-tradeoff-fit-01',type:'compare',prompt:'เปรียบเทียบ Trade-off กับ Fit ในมุมมองของ Porter',conceptIds:['trade-offs','fit'],lectureIds:['lec-08','lec-09'],caseIds:['ikea','southwest']},
+    {id:'q-competition-01',type:'essay',prompt:'Compete to be the Best ต่างจาก Compete to be Unique อย่างไร',conceptIds:['competitive-convergence','compete-to-be-unique'],lectureIds:['lec-03'],caseIds:['ikea','southwest']}
+  ]
+};
+
+var state = {view:'dashboard',layer:'all',query:'',selectedId:null,selectedType:null};
+var app = document.getElementById('app');
+var searchInput = document.getElementById('global-search');
+
+function escapeHtml(value){
+  return String(value == null ? '' : value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
+}
+function byId(collection,id){
+  var list = db[collection] || [];
+  for(var i=0;i<list.length;i++){ if(list[i].id === id) return list[i]; }
+  return null;
+}
+function layerOf(id){ return byId('layers',id); }
+function layerClass(layerId){ return layerId === 'understand-world' ? 'layer-1' : (layerId === 'formulate-strategy' ? 'layer-2' : 'layer-3'); }
+function idsToCards(collection, ids){
+  var out = [];
+  ids = ids || [];
+  for(var i=0;i<ids.length;i++){ var item = byId(collection,ids[i]); if(item) out.push(item); }
+  return out;
+}
+function contains(text,query){ return String(text || '').toLowerCase().indexOf(String(query || '').toLowerCase()) !== -1; }
+function joinMap(list, fn){
+  var out = [];
+  for(var i=0;i<list.length;i++){ out.push(fn(list[i],i)); }
+  return out.join('');
+}
+function joinText(list, fn){
+  var out = [];
+  for(var i=0;i<list.length;i++){ out.push(fn(list[i],i)); }
+  return out.join(' ');
+}
+function setText(id,value){ var el = document.getElementById(id); if(el) el.textContent = value; }
+function setCounts(){
+  setText('count-lectures', db.lectures.length);
+  setText('count-concepts', db.concepts.length);
+  setText('count-frameworks', db.frameworks.length);
+  setText('count-cases', db.cases.length);
+  setText('count-textbook', db.textbookChapters.length);
+}
+function setActiveNav(){
+  var viewBtns = document.querySelectorAll('[data-view]');
+  for(var i=0;i<viewBtns.length;i++){ viewBtns[i].classList.toggle('active', viewBtns[i].getAttribute('data-view') === state.view); }
+  var layerBtns = document.querySelectorAll('.layer-filter');
+  for(var j=0;j<layerBtns.length;j++){ layerBtns[j].classList.toggle('active', layerBtns[j].getAttribute('data-layer') === state.layer); }
+}
+function searchableText(item,type){
+  if(type === 'lecture'){
+    var concepts = joinText(idsToCards('concepts',item.conceptIds),function(x){return x.name + ' ' + x.th;});
+    var cases = joinText(idsToCards('cases',item.caseIds),function(x){return x.company + ' ' + x.issue;});
+    return [item.title,item.titleTh,item.objective,item.bigIdea,concepts,cases].join(' ');
+  }
+  if(type === 'concept') return [item.name,item.th,item.summary].join(' ');
+  if(type === 'framework') return [item.name,item.summary].join(' ');
+  if(type === 'case') return [item.company,item.issue].join(' ');
+  if(type === 'textbook') return [item.title,(item.keywords || []).join(' ')].join(' ');
+  return '';
+}
+function filterByLayer(items,type){
+  if(state.layer === 'all') return items.slice();
+  var out = [];
+  for(var i=0;i<items.length;i++){
+    var item = items[i];
+    if(type === 'lecture'){
+      if(item.layer === state.layer) out.push(item);
+    }else{
+      var lectureIds = item.lectureIds || [];
+      for(var j=0;j<lectureIds.length;j++){
+        var lec = byId('lectures',lectureIds[j]);
+        if(lec && lec.layer === state.layer){ out.push(item); break; }
+      }
+    }
+  }
+  return out;
+}
+function filterByQuery(items,type){
+  if(!state.query) return items.slice();
+  var out = [];
+  for(var i=0;i<items.length;i++){
+    if(contains(searchableText(items[i],type),state.query)) out.push(items[i]);
+  }
+  return out;
+}
+function cardBadgeForLecture(lecture){
+  var layer = layerOf(lecture.layer) || {label:'Layer'};
+  return '<span class="badge '+layerClass(lecture.layer)+'">'+escapeHtml(layer.label)+'</span>';
+}
+function layerCardClass(layerId){ return 'card layer-' + escapeHtml(layerId); }
+
+function renderDashboard(){
+  var grading = db.course.grading;
+  var html = '';
+  html += '<section class="hero">';
+  html += '<div class="kicker">'+escapeHtml(db.course.code)+' · '+escapeHtml(db.course.year)+'</div>';
+  html += '<h1>'+escapeHtml(db.course.title)+'</h1>';
+  html += '<p>'+escapeHtml(db.course.titleTh)+' · '+escapeHtml(db.course.instructor)+'<br>Phase 1 เน้นโครงสร้าง data-driven ก่อน เพื่อให้ Phase 2 เติมเนื้อหาได้โดยไม่ต้องรื้อ UI หลัก</p>';
+  html += '<div class="stat-grid">';
+  html += '<div class="stat"><div class="stat-num">'+db.lectures.length+'</div><div class="stat-label">Lectures</div></div>';
+  html += '<div class="stat"><div class="stat-num">'+db.concepts.length+'</div><div class="stat-label">Concepts</div></div>';
+  html += '<div class="stat"><div class="stat-num">'+db.frameworks.length+'</div><div class="stat-label">Frameworks</div></div>';
+  html += '<div class="stat"><div class="stat-num">'+db.cases.length+'</div><div class="stat-label">Cases</div></div>';
+  html += '</div></section>';
+  html += '<section class="grid">';
+  html += joinMap(db.layers,function(layer){
+    var count = filterByLayer(db.lectures,'lecture').filter ? db.lectures.filter(function(l){return l.layer === layer.id;}).length : 0;
+    return '<button class="'+layerCardClass(layer.id)+'" data-layer="'+escapeHtml(layer.id)+'" onclick="openLayer(\''+escapeHtml(layer.id)+'\')">'+
+      '<div class="card-top"><span class="badge '+layerClass(layer.id)+'">'+escapeHtml(layer.label)+'</span><span class="card-id">'+count+' lec</span></div>'+
+      '<div class="card-title">'+escapeHtml(layer.title)+'</div><div class="card-text">'+escapeHtml(layer.description)+'</div></button>';
+  });
+  html += '</section>';
+  html += '<div class="section-title">Assessment Structure</div><section class="grid">';
+  html += '<div class="card"><div class="card-title">Participation</div><div class="card-text">ร่วมในการเรียน</div><div class="meta-row"><span class="mini">'+grading.participation+'%</span></div></div>';
+  html += '<div class="card"><div class="card-title">Case Discussion</div><div class="card-text">เคสและการอภิปราย</div><div class="meta-row"><span class="mini">'+grading.caseDiscussion+'%</span></div></div>';
+  html += '<div class="card"><div class="card-title">BSG Simulation</div><div class="card-text">เกมส์กลยุทธ์</div><div class="meta-row"><span class="mini">'+grading.simulation+'%</span></div></div>';
+  html += '<div class="card"><div class="card-title">Final Exam</div><div class="card-text">สอบปลายภาค</div><div class="meta-row"><span class="mini">'+grading.finalExam+'%</span></div></div>';
+  html += '</section><div class="test-panel" id="test-output">Self-tests: waiting...</div>';
+  app.innerHTML = html;
+}
+function renderCollection(view){
+  var configs = {
+    lectures:{title:'Lectures',type:'lecture',items:db.lectures,render:renderLectureCard},
+    concepts:{title:'Concept Encyclopedia',type:'concept',items:db.concepts,render:renderConceptCard},
+    frameworks:{title:'Frameworks / Tools',type:'framework',items:db.frameworks,render:renderFrameworkCard},
+    cases:{title:'Case Bank',type:'case',items:db.cases,render:renderCaseCard},
+    textbook:{title:'Textbook Companion',type:'textbook',items:db.textbookChapters,render:renderTextbookCard}
+  };
+  var config = configs[view];
+  var items = filterByQuery(filterByLayer(config.items,config.type),config.type);
+  var html = '<section class="hero"><div class="kicker">'+escapeHtml(config.title)+'</div><h1>'+escapeHtml(config.title)+'</h1>';
+  html += '<p>ข้อมูลหน้านี้ render จาก db โดยตรง — Phase 2 จะเติมรายละเอียดลง data model นี้ ไม่ต้องรื้อ UI หลัก</p><div class="toolbar">';
+  html += '<button class="chip '+(state.layer === 'all' ? 'active' : '')+'" onclick="openLayer(\'all\')">All</button>';
+  html += joinMap(db.layers,function(layer){return '<button class="chip '+(state.layer === layer.id ? 'active' : '')+'" onclick="openLayer(\''+escapeHtml(layer.id)+'\')">'+escapeHtml(layer.label)+'</button>';});
+  html += '</div></section>';
+  html += items.length ? '<section class="grid">'+joinMap(items,config.render)+'</section>' : '<div class="empty">ไม่พบข้อมูลที่ตรงกับคำค้นหรือ filter</div>';
+  app.innerHTML = html;
+}
+function renderLectureCard(lecture){
+  return '<button class="card layer-'+escapeHtml(lecture.layer)+'" data-layer="'+escapeHtml(lecture.layer)+'" onclick="openDetail(\'lecture\',\''+escapeHtml(lecture.id)+'\')">'+
+    '<div class="card-top">'+cardBadgeForLecture(lecture)+'<span class="card-id">LEC '+String(lecture.no).padStart(2,'0')+'</span></div>'+
+    '<div class="card-title">'+escapeHtml(lecture.title)+'</div><div class="card-sub">'+escapeHtml(lecture.titleTh)+'</div><div class="card-text">'+escapeHtml(lecture.bigIdea)+'</div>'+
+    '<div class="meta-row"><span class="mini">'+lecture.conceptIds.length+' concepts</span><span class="mini">'+lecture.frameworkIds.length+' tools</span><span class="mini">'+lecture.caseIds.length+' cases</span></div></button>';
+}
+function renderConceptCard(concept){
+  return '<button class="card" onclick="openDetail(\'concept\',\''+escapeHtml(concept.id)+'\')"><div class="card-top"><span class="badge layer-1">Concept</span><span class="card-id">'+escapeHtml(concept.lectureIds.join(', ').replace(/lec-/g,'L'))+'</span></div><div class="card-title">'+escapeHtml(concept.name)+'</div><div class="card-sub">'+escapeHtml(concept.th)+'</div><div class="card-text">'+escapeHtml(concept.summary)+'</div></button>';
+}
+function renderFrameworkCard(framework){
+  return '<button class="card" onclick="openDetail(\'framework\',\''+escapeHtml(framework.id)+'\')"><div class="card-top"><span class="badge layer-2">Tool</span><span class="card-id">'+framework.lectureIds.length+' lec</span></div><div class="card-title">'+escapeHtml(framework.name)+'</div><div class="card-text">'+escapeHtml(framework.summary)+'</div></button>';
+}
+function renderCaseCard(item){
+  return '<button class="card" onclick="openDetail(\'case\',\''+escapeHtml(item.id)+'\')"><div class="card-top"><span class="badge layer-3">Case</span><span class="card-id">'+escapeHtml(item.lectureIds.join(', ').replace(/lec-/g,'L'))+'</span></div><div class="card-title">'+escapeHtml(item.company)+'</div><div class="card-text">'+escapeHtml(item.issue)+'</div></button>';
+}
+function renderTextbookCard(chapter){
+  var tags = joinMap(chapter.keywords.slice(0,4),function(k){return '<span class="mini">'+escapeHtml(k)+'</span>';});
+  return '<button class="card" onclick="openDetail(\'textbook\',\''+escapeHtml(chapter.id)+'\')"><div class="card-top"><span class="badge layer-1">Chapter</span><span class="card-id">CH '+String(chapter.no).padStart(2,'0')+'</span></div><div class="card-title">'+escapeHtml(chapter.title)+'</div><div class="meta-row">'+tags+'</div></button>';
+}
+function renderDetail(type,id){
+  if(type === 'lecture') return renderLectureDetail(byId('lectures',id));
+  if(type === 'concept') return renderConceptDetail(byId('concepts',id));
+  if(type === 'framework') return renderFrameworkDetail(byId('frameworks',id));
+  if(type === 'case') return renderCaseDetail(byId('cases',id));
+  if(type === 'textbook') return renderTextbookDetail(byId('textbookChapters',id));
+  app.innerHTML = '<div class="empty">ไม่พบข้อมูล</div>';
+}
+function renderSmallLink(type){
+  return function(item){
+    if(!item) return '';
+    var title = item.title || item.name || item.company || ('Chapter '+item.no);
+    var desc = item.titleTh || item.th || item.summary || item.issue || '';
+    return '<button class="link-card" onclick="openDetail(\''+escapeHtml(type)+'\',\''+escapeHtml(item.id)+'\')"><div class="link-name">'+escapeHtml(title)+'</div><div class="link-desc">'+escapeHtml(desc)+'</div></button>';
+  };
+}
+function renderLectureDetail(lec){
+  if(!lec){ app.innerHTML = '<div class="empty">ไม่พบ Lecture</div>'; return; }
+  var html = '<article class="detail"><header class="detail-head">'+cardBadgeForLecture(lec)+'<h1 class="detail-title">'+escapeHtml(lec.title)+'</h1><p class="detail-sub">'+escapeHtml(lec.titleTh)+' · '+escapeHtml(lec.objective)+'</p>';
+  html += '<div class="tabs"><button class="tab active">Overview</button><button class="tab">Concepts</button><button class="tab">Frameworks</button><button class="tab">Cases</button><button class="tab">Textbook</button><button class="tab">Source Refs</button></div></header><div class="detail-body">';
+  html += '<div class="section-title">Big Idea</div><p>'+escapeHtml(lec.bigIdea)+'</p>';
+  html += '<div class="section-title">Concepts</div><div class="link-grid">'+joinMap(idsToCards('concepts',lec.conceptIds),renderSmallLink('concept'))+'</div>';
+  html += '<div class="section-title">Frameworks / Tools</div><div class="link-grid">'+joinMap(idsToCards('frameworks',lec.frameworkIds),renderSmallLink('framework'))+'</div>';
+  html += '<div class="section-title">Cases</div><div class="link-grid">'+joinMap(idsToCards('cases',lec.caseIds),renderSmallLink('case'))+'</div>';
+  html += '<div class="section-title">Textbook Connection</div><div class="link-grid">'+joinMap(idsToCards('textbookChapters',lec.textbookChapterIds),renderSmallLink('textbook'))+'</div>';
+  html += '<div class="section-title">Source Reference Placeholder</div><ul class="clean"><li>Lecture note pages: '+(lec.sourceRefs.lectureNotePages.length ? lec.sourceRefs.lectureNotePages.join(', ') : 'to be filled in Phase 2')+'</li><li>Textbook pages: '+(lec.sourceRefs.textbookPages.length ? lec.sourceRefs.textbookPages.join(', ') : 'to be filled in Phase 2')+'</li></ul>';
+  html += '</div></article>';
+  app.innerHTML = html;
+}
+function renderConceptDetail(concept){
+  if(!concept){ app.innerHTML = '<div class="empty">ไม่พบ Concept</div>'; return; }
+  app.innerHTML = '<article class="detail"><header class="detail-head"><span class="badge layer-1">Concept</span><h1 class="detail-title">'+escapeHtml(concept.name)+'</h1><p class="detail-sub">'+escapeHtml(concept.th)+'</p></header><div class="detail-body"><div class="section-title">Summary</div><p>'+escapeHtml(concept.summary)+'</p><div class="section-title">Related Lectures</div><div class="link-grid">'+joinMap(idsToCards('lectures',concept.lectureIds),renderSmallLink('lecture'))+'</div><div class="section-title">Related Cases</div><div class="link-grid">'+(joinMap(idsToCards('cases',concept.caseIds || []),renderSmallLink('case')) || '<div class="empty">ยังไม่มี case ที่เชื่อมไว้</div>')+'</div><div class="section-title">Textbook</div><div class="link-grid">'+joinMap(idsToCards('textbookChapters',concept.textbookChapterIds || []),renderSmallLink('textbook'))+'</div></div></article>';
+}
+function renderFrameworkDetail(framework){
+  if(!framework){ app.innerHTML = '<div class="empty">ไม่พบ Framework</div>'; return; }
+  app.innerHTML = '<article class="detail"><header class="detail-head"><span class="badge layer-2">Framework</span><h1 class="detail-title">'+escapeHtml(framework.name)+'</h1><p class="detail-sub">'+escapeHtml(framework.summary)+'</p></header><div class="detail-body"><div class="section-title">Related Concepts</div><div class="link-grid">'+joinMap(idsToCards('concepts',framework.conceptIds || []),renderSmallLink('concept'))+'</div><div class="section-title">Related Lectures</div><div class="link-grid">'+joinMap(idsToCards('lectures',framework.lectureIds || []),renderSmallLink('lecture'))+'</div></div></article>';
+}
+function renderCaseDetail(item){
+  if(!item){ app.innerHTML = '<div class="empty">ไม่พบ Case</div>'; return; }
+  app.innerHTML = '<article class="detail"><header class="detail-head"><span class="badge layer-3">Case</span><h1 class="detail-title">'+escapeHtml(item.company)+'</h1><p class="detail-sub">'+escapeHtml(item.issue)+'</p></header><div class="detail-body"><div class="section-title">Concepts Illustrated</div><div class="link-grid">'+joinMap(idsToCards('concepts',item.conceptIds || []),renderSmallLink('concept'))+'</div><div class="section-title">Related Lectures</div><div class="link-grid">'+joinMap(idsToCards('lectures',item.lectureIds || []),renderSmallLink('lecture'))+'</div></div></article>';
+}
+function renderTextbookDetail(chapter){
+  if(!chapter){ app.innerHTML = '<div class="empty">ไม่พบ Textbook Chapter</div>'; return; }
+  var relatedLectures = [];
+  for(var i=0;i<db.lectures.length;i++){ if(db.lectures[i].textbookChapterIds.indexOf(chapter.id) !== -1) relatedLectures.push(db.lectures[i]); }
+  var relatedConcepts = [];
+  for(var j=0;j<db.concepts.length;j++){ if((db.concepts[j].textbookChapterIds || []).indexOf(chapter.id) !== -1) relatedConcepts.push(db.concepts[j]); }
+  app.innerHTML = '<article class="detail"><header class="detail-head"><span class="badge layer-1">Chapter '+chapter.no+'</span><h1 class="detail-title">'+escapeHtml(chapter.title)+'</h1><p class="detail-sub">Keywords: '+escapeHtml(chapter.keywords.join(', '))+'</p></header><div class="detail-body"><div class="section-title">Related Lectures</div><div class="link-grid">'+(joinMap(relatedLectures,renderSmallLink('lecture')) || '<div class="empty">ยังไม่ได้เชื่อม lecture</div>')+'</div><div class="section-title">Related Concepts</div><div class="link-grid">'+(joinMap(relatedConcepts,renderSmallLink('concept')) || '<div class="empty">ยังไม่ได้เชื่อม concept</div>')+'</div></div></article>';
+}
+function openDetail(type,id){
+  state.view = 'detail'; state.selectedId = id; state.selectedType = type;
+  setActiveNav(); renderDetail(type,id); window.scrollTo({top:0,behavior:'smooth'});
+}
+function openLayer(layerId){
+  state.layer = layerId;
+  if(state.view === 'dashboard') state.view = 'lectures';
+  setActiveNav(); route();
+}
+function route(){
+  setActiveNav();
+  if(state.view === 'dashboard') return renderDashboard();
+  if(state.view === 'lectures' || state.view === 'concepts' || state.view === 'frameworks' || state.view === 'cases' || state.view === 'textbook') return renderCollection(state.view);
+  if(state.view === 'detail') return renderDetail(state.selectedType,state.selectedId);
+}
+function addListeners(){
+  var viewBtns = document.querySelectorAll('[data-view]');
+  for(var i=0;i<viewBtns.length;i++){
+    viewBtns[i].addEventListener('click',function(){ state.view = this.getAttribute('data-view'); state.selectedId = null; route(); window.scrollTo({top:0,behavior:'smooth'}); });
+  }
+  var layerBtns = document.querySelectorAll('.layer-filter');
+  for(var j=0;j<layerBtns.length;j++){
+    layerBtns[j].addEventListener('click',function(){ openLayer(this.getAttribute('data-layer')); });
+  }
+  searchInput.addEventListener('input',function(){ state.query = searchInput.value.trim(); if(state.view === 'dashboard') state.view = 'lectures'; route(); });
+}
+function runSelfTests(){
+  var tests = [];
+  function test(name, fn){
+    try{ tests.push({name:name, ok:!!fn()}); }
+    catch(err){ tests.push({name:name, ok:false, error:err.message}); }
+  }
+  test('db has 11 lectures',function(){ return db.lectures.length === 11; });
+  test('all lecture references resolve',function(){
+    for(var i=0;i<db.lectures.length;i++){
+      var lec = db.lectures[i];
+      var groups = [['concepts',lec.conceptIds],['frameworks',lec.frameworkIds],['cases',lec.caseIds],['textbookChapters',lec.textbookChapterIds]];
+      for(var g=0;g<groups.length;g++){
+        for(var k=0;k<groups[g][1].length;k++){ if(!byId(groups[g][0],groups[g][1][k])) return false; }
+      }
+    }
+    return true;
+  });
+  test('search finds risk appetite',function(){ state.query = 'risk appetite'; return filterByQuery(db.concepts,'concept').length > 0; });
+  state.query = searchInput.value.trim();
+  test('render lecture card returns HTML',function(){ return renderLectureCard(db.lectures[0]).indexOf('LEC 01') !== -1; });
+  var passed = 0;
+  for(var i=0;i<tests.length;i++){ if(tests[i].ok) passed++; }
+  var output = document.getElementById('test-output');
+  if(output){ output.textContent = 'Self-tests: '+passed+'/'+tests.length+' passed'; }
+  if(window.console){ console.log('BA8000 self-tests',tests); }
+}
+
+window.openDetail = openDetail;
+window.openLayer = openLayer;
+
+setCounts();
+addListeners();
+route();
+runSelfTests();
+})();
+</script>
+</body>
+</html>
