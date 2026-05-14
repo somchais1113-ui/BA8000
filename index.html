@@ -1,1 +1,427 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BA8000 — Strategy Learning System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#090a0d;
+  --bg2:#0d1017;
+  --surface:#121722;
+  --surface2:#1a2130;
+  --line:rgba(255,255,255,.10);
+  --line2:rgba(255,255,255,.18);
+  --text:#f4f0e8;
+  --muted:#aaa49b;
+  --faint:#716d66;
+  --purple:#988dff;
+  --teal:#44d5a6;
+  --coral:#ff865e;
+  --gold:#e0bd62;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans Thai',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  font-family:var(--sans);
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 4%,rgba(152,141,255,.20),transparent 34rem),
+    radial-gradient(circle at 92% 12%,rgba(68,213,166,.14),transparent 34rem),
+    radial-gradient(circle at 52% 92%,rgba(255,134,94,.10),transparent 30rem),
+    linear-gradient(180deg,#08090c 0%,#0a0d13 50%,#090a0d 100%);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 72%);
+  opacity:.22;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatGlow{0%,100%{transform:translate3d(-2%,0,0) rotate(0deg)}50%{transform:translate3d(2%,2%,0) rotate(8deg)}}
+@keyframes pulse{0%,100%{opacity:.65;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  border-bottom:1px solid var(--line);
+  background:rgba(9,10,13,.72);
+  backdrop-filter:blur(18px) saturate(140%);
+}
+.topbar-inner{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:40px;height:40px;
+  display:grid;place-items:center;
+  border-radius:15px;
+  color:var(--purple);
+  font:800 13px/1 var(--mono);
+  background:linear-gradient(135deg,rgba(152,141,255,.22),rgba(68,213,166,.10));
+  border:1px solid rgba(152,141,255,.28);
+  box-shadow:0 0 36px rgba(152,141,255,.10);
+}
+.brand-title{font:800 13px/1 var(--mono);letter-spacing:.12em}
+.nav{display:flex;align-items:center;gap:6px;overflow:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  white-space:nowrap;
+  padding:9px 12px;
+  border-radius:999px;
+  color:var(--muted);
+  font:700 12px/1 var(--mono);
+  transition:background .18s,color .18s,transform .18s;
+}
+.nav a:hover{color:var(--text);background:rgba(255,255,255,.06);transform:translateY(-1px)}
+
+.hero{
+  position:relative;
+  padding:82px 0 56px;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) 390px;
+  gap:36px;
+  align-items:center;
+}
+.hero-copy,.hero-panel,.section-head,.feature-card,.phase-card{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  min-height:32px;
+  padding:7px 13px;
+  border:1px solid rgba(152,141,255,.26);
+  border-radius:999px;
+  background:rgba(152,141,255,.11);
+  color:#b6afff;
+  font:800 11px/1 var(--mono);
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  margin-bottom:22px;
+}
+.kicker::before{
+  content:"";
+  width:7px;height:7px;border-radius:50%;
+  background:currentColor;
+  box-shadow:0 0 16px currentColor;
+  animation:pulse 2.3s ease-in-out infinite;
+}
+h1{
+  max-width:820px;
+  font-size:clamp(44px,7vw,86px);
+  font-weight:300;
+  line-height:.96;
+  letter-spacing:-.06em;
+}
+h1 span{
+  display:block;
+  background:linear-gradient(90deg,var(--text),#cbc6ff 48%,#abf4db 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero-sub{
+  max-width:720px;
+  margin-top:24px;
+  color:var(--muted);
+  font-size:17px;
+}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  min-height:46px;
+  padding:12px 17px;
+  border-radius:999px;
+  font-weight:700;
+  transition:transform .18s,background .18s,border-color .18s,box-shadow .18s;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--purple),#7669ec);
+  color:white;
+  box-shadow:0 18px 44px rgba(152,141,255,.20);
+}
+.btn-secondary{
+  border:1px solid var(--line2);
+  color:var(--muted);
+  background:rgba(255,255,255,.045);
+}
+.btn:hover{transform:translateY(-3px)}
+.btn-secondary:hover{color:var(--text);background:rgba(255,255,255,.07)}
+
+.hero-panel{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:32px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));
+  box-shadow:0 26px 90px rgba(0,0,0,.32);
+  padding:22px;
+  animation-delay:.1s;
+}
+.hero-panel::before{
+  content:"";
+  position:absolute;
+  inset:-45%;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 30% 26%,rgba(152,141,255,.26),transparent 18rem),
+    radial-gradient(circle at 70% 58%,rgba(68,213,166,.14),transparent 20rem);
+  animation:floatGlow 9s ease-in-out infinite;
+}
+.panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;color:var(--faint);font:700 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.dots{display:flex;gap:7px}.dots span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.16)}
+.course-card{
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:rgba(0,0,0,.18);
+  margin-bottom:12px;
+}
+.course-card h3{font-size:18px;line-height:1.3;margin-bottom:6px}
+.course-card p{font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+}
+.stat-num{font:800 24px/1 var(--mono);margin-bottom:6px}.stat-label{font-size:12px;color:var(--muted);line-height:1.35}
+
+.section{padding:52px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
+.section-kicker{font:800 11px/1 var(--mono);letter-spacing:.13em;color:var(--faint);text-transform:uppercase;margin-bottom:10px}
+h2{font-size:clamp(28px,4vw,46px);font-weight:400;line-height:1.08;letter-spacing:-.045em}
+.section-desc{max-width:560px;color:var(--muted);font-size:15px;margin-top:8px}
+.grid{display:grid;gap:16px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.feature-card,.phase-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:26px;
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.030));
+  padding:20px;
+  min-height:190px;
+  box-shadow:0 20px 65px rgba(0,0,0,.20);
+  transition:transform .22s,border-color .22s,background .22s,box-shadow .22s;
+}
+.feature-card::after,.phase-card::after{
+  content:"";
+  position:absolute;
+  width:140px;height:140px;
+  right:-58px;top:-58px;
+  border-radius:50%;
+  background:rgba(255,255,255,.055);
+  z-index:-1;
+  transition:transform .24s,opacity .24s;
+}
+.feature-card:hover,.phase-card:hover{transform:translateY(-5px);border-color:var(--line2);background:rgba(255,255,255,.075);box-shadow:0 28px 80px rgba(0,0,0,.30)}
+.feature-card:hover::after,.phase-card:hover::after{transform:scale(1.22)}
+.icon{
+  width:42px;height:42px;
+  display:grid;place-items:center;
+  border-radius:16px;
+  margin-bottom:18px;
+  font:800 13px/1 var(--mono);
+}
+.icon.purple{color:#b5aeff;background:rgba(152,141,255,.16);border:1px solid rgba(152,141,255,.28)}
+.icon.teal{color:#65eac0;background:rgba(68,213,166,.14);border:1px solid rgba(68,213,166,.26)}
+.icon.coral{color:#ff9c79;background:rgba(255,134,94,.15);border:1px solid rgba(255,134,94,.28)}
+.icon.gold{color:#f0d17a;background:rgba(224,189,98,.13);border:1px solid rgba(224,189,98,.25)}
+.feature-card h3,.phase-card h3{font-size:19px;line-height:1.25;margin-bottom:8px}.feature-card p,.phase-card p{font-size:14px;color:var(--muted)}
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+.badge{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.055);color:var(--faint);font:700 10px/1 var(--mono)}
+
+.phase-card{min-height:230px}
+.phase-no{font:900 12px/1 var(--mono);letter-spacing:.12em;color:var(--faint);margin-bottom:12px}
+.phase-card:nth-child(1){border-color:rgba(152,141,255,.24)}
+.phase-card:nth-child(2){border-color:rgba(68,213,166,.23)}
+.phase-card:nth-child(3){border-color:rgba(255,134,94,.23)}
+.phase-card:nth-child(4){border-color:rgba(224,189,98,.23)}
+.phase-card:nth-child(5){border-color:rgba(152,141,255,.18)}
+
+.footer{padding:32px 0 50px;color:var(--faint);font:600 12px/1.7 var(--mono)}
+.footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+
+@media(max-width:980px){.hero-grid{grid-template-columns:1fr}.hero-panel{max-width:560px}.grid-3,.grid-5{grid-template-columns:repeat(2,minmax(0,1fr))}.section-head{display:block}.nav{max-width:60vw}}
+@media(max-width:640px){.container{width:calc(100% - 28px)}.topbar-inner{height:auto;padding:14px 0;align-items:flex-start;flex-direction:column}.nav{max-width:100%;width:100%}.hero{padding:48px 0 34px}.grid-3,.grid-5,.stats{grid-template-columns:1fr}h1{font-size:44px}.actions{flex-direction:column}.btn{justify-content:center}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a class="brand" href="#top" aria-label="BA8000 Home">
+      <span class="brand-mark">BA</span>
+      <span class="brand-title">BA8000</span>
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#system">System</a>
+      <a href="#features">Features</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="ba8000_phase1_data_driven.html">Open App</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="kicker">Strategy Learning System · Phase 1</div>
+        <h1><span>Business Policy</span><span>& Strategic</span><span>Management</span></h1>
+        <p class="hero-sub">
+          เว็บอ่านสอบ BA8000 แบบ data-driven ที่เชื่อม Lecture, Concepts, Frameworks, Cases และ Textbook Chapters เข้าด้วยกัน เพื่อให้ค้นง่าย อ่านง่าย และต่อยอดเป็นระบบเรียนเต็มรูปแบบได้
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="ba8000_phase1_data_driven.html">เปิด Phase 1 App →</a>
+          <a class="btn btn-secondary" href="#roadmap">ดู Roadmap</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="Course overview">
+        <div class="panel-top"><div class="dots"><span></span><span></span><span></span></div><div>BA8000</div></div>
+        <div class="course-card">
+          <h3>Course Knowledge Base</h3>
+          <p>แยกข้อมูลออกจาก UI เพื่อให้เติมเนื้อหา Lecture 1–11, textbook, cases และ exam tools ได้เรื่อย ๆ</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">11</div><div class="stat-label">Lectures</div></div>
+          <div class="stat"><div class="stat-num">12</div><div class="stat-label">Textbook Chapters</div></div>
+          <div class="stat"><div class="stat-num">37+</div><div class="stat-label">Concepts mapped</div></div>
+          <div class="stat"><div class="stat-num">23+</div><div class="stat-label">Cases linked</div></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="system">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">System Structure</div>
+          <h2>จากหน้าเว็บสรุปธรรมดา → ระบบอ่านสอบที่ขยายได้</h2>
+          <p class="section-desc">แกนหลักคือ data model เดียว แล้วให้ทุกหน้า render จากข้อมูลชุดเดียวกัน ทำให้ไม่ต้อง hardcode เนื้อหาซ้ำในหลายจุด</p>
+        </div>
+      </div>
+      <div class="grid grid-3">
+        <article class="feature-card">
+          <div class="icon purple">01</div>
+          <h3>Lectures</h3>
+          <p>แผนที่ 11 lectures พร้อม layer, objective, concepts, frameworks, cases และ textbook links</p>
+          <div class="badges"><span class="badge">Layer 1–3</span><span class="badge">Source refs</span></div>
+        </article>
+        <article class="feature-card">
+          <div class="icon teal">02</div>
+          <h3>Concepts</h3>
+          <p>คลังคำสำคัญ เช่น Risk Appetite, VRIN, Trade-offs, Fit, Culture, Value Chain</p>
+          <div class="badges"><span class="badge">Searchable</span><span class="badge">Cross-linked</span></div>
+        </article>
+        <article class="feature-card">
+          <div class="icon coral">03</div>
+          <h3>Cases</h3>
+          <p>รวมบริษัทและกรณีศึกษาที่เชื่อมกับ lecture และ concept เพื่อใช้จำและตอบสอบ</p>
+          <div class="badges"><span class="badge">Meta</span><span class="badge">SCBX</span><span class="badge">IKEA</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Current Phase 1 Features</div>
+          <h2>ของที่มีในเวอร์ชันแรก</h2>
+          <p class="section-desc">เวอร์ชันนี้ตั้งใจให้เป็น skeleton ที่แข็งแรงก่อน แล้วค่อยเติมรายละเอียดจาก lecture note และ textbook ใน Phase 2</p>
+        </div>
+      </div>
+      <div class="grid grid-3">
+        <article class="feature-card"><div class="icon purple">DB</div><h3>Data-driven DB</h3><p>ใช้ object กลางสำหรับ course, lectures, concepts, frameworks, cases, textbook chapters และ exam questions</p></article>
+        <article class="feature-card"><div class="icon teal">UX</div><h3>Search & Filter</h3><p>มี search กลาง และ layer filter เพื่อแยกเนื้อหาเข้าใจโลก / กำหนดกลยุทธ์ / สื่อสารและขับเคลื่อน</p></article>
+        <article class="feature-card"><div class="icon coral">QA</div><h3>Self-tests</h3><p>มี self-tests ในหน้า app เพื่อตรวจว่า reference สำคัญ resolve ได้ และ search ยังทำงานถูกต้อง</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roadmap">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Implementation Roadmap</div>
+          <h2>Roadmap การปรับจริง</h2>
+          <p class="section-desc">ลำดับการทำงานคือ โครงข้อมูลก่อน → เนื้อหาเต็มขึ้น → หาเจอง่าย → อ่านสอบได้ → ค่อย polish UI</p>
+        </div>
+      </div>
+      <div class="grid grid-5">
+        <article class="phase-card">
+          <div class="phase-no">PHASE 1</div>
+          <div class="icon purple">1</div>
+          <h3>Restructure</h3>
+          <p>แยกข้อมูลออกจาก UI ให้มี lectures / concepts / frameworks / cases / textbook chapters</p>
+        </article>
+        <article class="phase-card">
+          <div class="phase-no">PHASE 2</div>
+          <div class="icon teal">2</div>
+          <h3>Expand Content</h3>
+          <p>เติมข้อมูลจาก lecture note และ textbook ทีละ lecture โดยเริ่มจาก Lecture 1–4</p>
+        </article>
+        <article class="phase-card">
+          <div class="phase-no">PHASE 3</div>
+          <div class="icon coral">3</div>
+          <h3>Navigation</h3>
+          <p>ทำ sidebar, search, filter by layer, textbook chapter, case และ exam relevance</p>
+        </article>
+        <article class="phase-card">
+          <div class="phase-no">PHASE 4</div>
+          <div class="icon gold">4</div>
+          <h3>Study Tools</h3>
+          <p>เพิ่ม flashcard, quiz, compare mode และ exam answer template</p>
+        </article>
+        <article class="phase-card">
+          <div class="phase-no">PHASE 5</div>
+          <div class="icon purple">5</div>
+          <h3>Polish UI</h3>
+          <p>เพิ่ม animation, diagram, visual design, responsive และ print/export mode</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>BA8000 · Business Policy and Strategic Management</div>
+    <div>Phase 1 · Data Driven Learning System</div>
+  </div>
+</footer>
+</body>
+</html>
 
