@@ -316,7 +316,7 @@ h2{font-size:clamp(28px,4vw,46px);font-weight:400;line-height:1.08;letter-spacin
       <a href="#system">System</a>
       <a href="#features">Features</a>
       <a href="#roadmap">Roadmap</a>
-      <a href="./ba8000_phase1_data_driven.html" data-app-link>Open App</a>
+      <a href="/BA8000/ba8000_phase1_data_driven.html" data-app-link>Open App</a>
     </nav>
   </div>
 </header>
@@ -331,7 +331,7 @@ h2{font-size:clamp(28px,4vw,46px);font-weight:400;line-height:1.08;letter-spacin
           เว็บอ่านสอบ BA8000 แบบ data-driven ที่เชื่อม Lecture, Concepts, Frameworks, Cases และ Textbook Chapters เข้าด้วยกัน เพื่อให้ค้นง่าย อ่านง่าย และต่อยอดเป็นระบบเรียนเต็มรูปแบบได้
         </p>
         <div class="actions">
-          <a class="btn btn-primary" href="./ba8000_phase1_data_driven.html" data-app-link>เปิด Phase 1 App →</a>
+          <a class="btn btn-primary" href="/BA8000/ba8000_phase1_data_driven.html" data-app-link>เปิด Phase 1 App →</a>
           <a class="btn btn-secondary" href="#roadmap">ดู Roadmap</a>
         </div>
       </div>
@@ -346,9 +346,9 @@ h2{font-size:clamp(28px,4vw,46px);font-weight:400;line-height:1.08;letter-spacin
               <strong>Phase 1 Data App</strong>
               <span>เปิดระบบ lecture / concept / case browser</span>
             </div>
-            <a class="launch-mini" href="./ba8000_phase1_data_driven.html" data-app-link>Launch →</a>
+            <a class="launch-mini" href="/BA8000/ba8000_phase1_data_driven.html" data-app-link>Launch →</a>
           </div>
-          <div class="path-note">Expected file path: ./ba8000_phase1_data_driven.html</div>
+          <div class="path-note">Expected GitHub Pages path: /BA8000/ba8000_phase1_data_driven.html</div>
         </div>
         <div class="stats">
           <div class="stat"><div class="stat-num">11</div><div class="stat-label">Lectures</div></div>
@@ -462,8 +462,10 @@ h2{font-size:clamp(28px,4vw,46px);font-weight:400;line-height:1.08;letter-spacin
 </footer>
 <script>
 (function(){
+  var appPath = '/BA8000/ba8000_phase1_data_driven.html';
   var links = document.querySelectorAll('[data-app-link]');
   for(var i=0;i<links.length;i++){
+    links[i].setAttribute('href', appPath);
     links[i].addEventListener('click',function(event){
       var href = this.getAttribute('href');
       if(!href || href === '#'){
